@@ -6,6 +6,6 @@ public class ChatEntity
     : IEntity
 {
     public int ChatId { get; set; }
-    public UserEntity[] Users { get; set; }
-    public MessageEntity[] Messages { get; set; }
+    public List<UserEntity> Users { get; set; }
+    public List<MessageEntity>? Messages { get; set; }
 }

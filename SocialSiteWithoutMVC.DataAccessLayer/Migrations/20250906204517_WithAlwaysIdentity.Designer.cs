@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SocialSiteWithoutMVC.DataAccessLayer;
@@ -11,9 +12,11 @@ using SocialSiteWithoutMVC.DataAccessLayer;
 namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
 {
     [DbContext(typeof(SocialSiteDbContext))]
-    partial class SocialSiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250906204517_WithAlwaysIdentity")]
+    partial class WithAlwaysIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +46,11 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ChatId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("ChatId"));
+
+                    b.PrimitiveCollection<string[]>("UserLogins")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.HasKey("ChatId");
 
@@ -56,7 +63,7 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("MessageId"));
 
                     b.Property<int>("ChatId")
                         .HasColumnType("integer");

@@ -1,56 +1,69 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using SocialSiteWithoutMVC.DataAccessLayer.Interfaces;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
 namespace SocialSiteWithoutMVC.DataAccessLayer.Repositories;
 
-public class UserRepository(SocialSiteDbContext context) : SocialSiteRepository(context)
+public class UserRepository(SocialSiteDbContext context) : IRepository
 {
-    public override async Task<bool> AddNew(IEntity userEntity)
+    public async Task AddNew(UserEntity user)
     {
-        var user = userEntity as UserEntity ?? throw new ArgumentException(nameof(userEntity));
-        if (await IsInDataBaseByLogin(user.Login)) return false;
-        
-        
         await context.Users
-                .AddAsync(userEntity as UserEntity ?? throw new InvalidOperationException());
+                .AddAsync(user);
         
         await context.SaveChangesAsync();
-        return true;
     }
 
-    public override async Task UpdateByPrimaryKey(IEntity entity)
+    public async Task UpdateUser(string loginNow,
+        Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls)
     {
         await context.Users
-            .Where(u => u.Login == (entity as UserEntity)!.Login)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(u => u.Login, (entity as UserEntity)!.Login)
-                .SetProperty(u => u.NickName, (entity as UserEntity)!.NickName)
-                .SetProperty(u => u.Password, (entity as UserEntity)!.Password)
-                .SetProperty(u => u.Chats, (entity as UserEntity)!.Chats));
+            .Where(u => u.Login == loginNow)
+            .ExecuteUpdateAsync(setPropertyCalls);
     }
 
-    public override async Task DeleteByPrimaryKey(string primaryKey)
+    public async Task DeleteByDate(UserEntity user)
     {
         await context.Users
-            .Where(u => u.Login == primaryKey)
+            .Where(u => u.Login == user.Login && u.Password == user.Password)
             .ExecuteDeleteAsync();
     }
 
-    public override async Task<IEntity?> GetByPrimaryKey(string login)
+    public async Task<UserEntity?> GetByLogin(string login)
     {
         var user = await context.Users
             .AsNoTracking()
+            .Include(u => u.Chats)
             .Where(u => u.Login == login)
             .FirstOrDefaultAsync();
         return user;
     }
+    
+    public async Task<UserEntity[]?> GetByFilter(string filter)
+    {
+        return await context.Users
+            .AsNoTracking()
+            .Where(u => u.Login.Contains(filter))
+            .ToArrayAsync();
+    }
 
-    private async Task<bool> IsInDataBaseByLogin(string login)
+    public async Task<bool> IsInDataBase(string login)
     {
         return await context.Users
             .AsNoTracking()
             .Where(u => u.Login == login)
             .AnyAsync();
+    }
+
+    public async Task Patch(string loginNow, string login, string password, string nickName)
+    {
+        await context.Users
+            .Where(u => u.Login == loginNow)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.Login, login)
+                .SetProperty(u => u.NickName, nickName)
+                .SetProperty(u => u.Password, password));
     }
 }
