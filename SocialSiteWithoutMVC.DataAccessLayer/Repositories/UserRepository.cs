@@ -56,14 +56,4 @@ public class UserRepository(SocialSiteDbContext context) : IRepository
             .Where(u => u.Login == login)
             .AnyAsync();
     }
-
-    public async Task Patch(string loginNow, string login, string password, string nickName)
-    {
-        await context.Users
-            .Where(u => u.Login == loginNow)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(u => u.Login, login)
-                .SetProperty(u => u.NickName, nickName)
-                .SetProperty(u => u.Password, password));
-    }
 }

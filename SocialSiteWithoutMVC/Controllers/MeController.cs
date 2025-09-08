@@ -29,21 +29,6 @@ public class MeController(UserService userService, EditUserService editUserServi
     }
     
     [HttpPatch("[action]")]
-    public async Task<IActionResult> EditLogin([Required] string newLogin)
-    {
-        if (context.HttpContext is null)
-            return BadRequest();
-
-        var loginNow = context.HttpContext.Request.Cookies["userLogin"];
-        if (loginNow is null)
-            return BadRequest("Error cookies, authorize again");
-        
-        var response = await editUserService.PatchLogin(loginNow, newLogin);
-        
-        return response ? Ok() : BadRequest();
-    }
-    
-    [HttpPatch("[action]")]
     public async Task<IActionResult> EditPassword([Required] string newPassword)
     {
         if (context.HttpContext is null)
