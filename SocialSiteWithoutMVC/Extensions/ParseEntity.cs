@@ -10,9 +10,7 @@ public static class ParseEntity
         return new UserModel
         {
             Nickname = user.NickName,
-            Login = user.Login,
-            ChatsId = user.Chats == null ? null 
-                : (from chat in user.Chats select chat.ChatId).ToArray()
+            Login = user.Login
         };
     }
     
@@ -20,16 +18,21 @@ public static class ParseEntity
     {
         var chatModel = new ChatModel
         {
-            ChatId = chat.ChatId
+            UsersLogins = chat.Users.Select(u => u.Login).ToArray(),
+            Messages = chat.Messages!.Select(m => m.ToModel()).ToArray()
         };
+        
         return chatModel;
     }
     
     public static MessageModel ToModel(this MessageEntity message)
     {
-        var messageModel = new MessageModel
+        var chatModel = new MessageModel
         {
+            DateTime = message.DateTime,
+            Text = message.Text
         };
-        return messageModel;
+        
+        return chatModel;
     }
 }
