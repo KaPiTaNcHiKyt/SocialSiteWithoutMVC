@@ -10,35 +10,33 @@ namespace SocialSiteWithoutMVC.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class MeController(UserService userService, EditUserService editUserService, IHttpContextAccessor context) : ControllerBase
+public class MeController(UserService userService, EditUserService editUserService, ChatService chatService, IHttpContextAccessor context) 
+    : ControllerBase
 {
     [HttpGet("[action]")]
     public async Task<ActionResult<(UserModel, ChatModel)>> GetMe()
     {
-        if (context.HttpContext is null)
+        var resultTest = MainTests(["userlogin"]);
+        if (!resultTest.isConfirmTest)
             return BadRequest();
-        var login = context.HttpContext.Request.Cookies["userLogin"];
-        if (login is null)
-            return BadRequest("Error cookies, authorize again");
 
-        var me = await userService.GetMe(login);
+        var me = await userService.GetMe(resultTest.cookies![0]);
+        var myChats = await chatService.GetAllByLogin(resultTest.cookies[0]);
 
-        var result = me.ToModel();
+        var meModel = me.ToModel();
+        meModel.ChatModels = myChats?.Select(c => c.ToModelWithoutMessages()).ToArray();
 
-        return Ok(result);
+        return Ok(meModel);
     }
     
     [HttpPatch("[action]")]
     public async Task<IActionResult> EditPassword([Required] string newPassword)
     {
-        if (context.HttpContext is null)
+        var resultTest = MainTests(["userlogin"]);
+        if (!resultTest.isConfirmTest)
             return BadRequest();
-
-        var loginNow = context.HttpContext.Request.Cookies["userLogin"];
-        if (loginNow is null)
-            return BadRequest("Error cookies, authorize again");
         
-        await editUserService.PatchPassword(loginNow, newPassword);
+        await editUserService.PatchPassword(resultTest.cookies![0], newPassword);
         
         return Ok();
     }
@@ -46,14 +44,11 @@ public class MeController(UserService userService, EditUserService editUserServi
     [HttpPatch("[action]")]
     public async Task<IActionResult> EditNickname([Required] string newNickName)
     {
-        if (context.HttpContext is null)
+        var resultTest = MainTests(["userlogin"]);
+        if (!resultTest.isConfirmTest)
             return BadRequest();
 
-        var loginNow = context.HttpContext.Request.Cookies["userLogin"];
-        if (loginNow is null)
-            return BadRequest("Error cookies, authorize again");
-        
-        await editUserService.PatchNickname(loginNow, newNickName);
+        await editUserService.PatchNickname(resultTest.cookies![0], newNickName);
         
         return Ok();
     }
@@ -61,13 +56,35 @@ public class MeController(UserService userService, EditUserService editUserServi
     [HttpDelete("[action]")]
     public async Task<IActionResult> DeleteAccount(string login, string password)
     {
-        if (context.HttpContext is null)
+        if (!MainTests())
             return BadRequest();
         
-        context.HttpContext.Response.Cookies.Delete("userLogin");
+        context.HttpContext!.Response.Cookies.Delete("userLogin");
         context.HttpContext.Response.Cookies.Delete("tasty-cookies");
         
         await userService.Delete(login, password);
         return Ok();
+    }
+
+    private bool MainTests()
+        => context.HttpContext is not null;
+
+    private (bool isConfirmTest, string[]? cookies) MainTests(string[] cookiesNames)
+    {
+        if (context.HttpContext is null)
+            return (false, null);
+
+        List<string> resultCookiesNames = new(4);
+        string? tempCookieName;
+
+        foreach (var cookieName in cookiesNames)
+        {
+            tempCookieName = context.HttpContext.Request.Cookies[cookieName];
+            if (tempCookieName is null)
+                return (false, null);
+            resultCookiesNames.Add(tempCookieName);
+        }
+
+        return (true, resultCookiesNames.ToArray());
     }
 }

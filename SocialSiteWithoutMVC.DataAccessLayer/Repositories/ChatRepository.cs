@@ -43,6 +43,15 @@ public class ChatRepository(SocialSiteDbContext context) : IRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<ChatEntity[]> GetAllByLogin(string login)
+    {
+        return await context.Chats
+            .AsNoTracking()
+            .Include(c => c.Users)
+            .Where(c => c.Users[0].Login == login || c.Users[1].Login == login)
+            .ToArrayAsync();
+    }
+
     private void AddChat(UserEntity userFrom, UserEntity userTo, ChatEntity chat)
     {
         if (userFrom.Chats is not null)

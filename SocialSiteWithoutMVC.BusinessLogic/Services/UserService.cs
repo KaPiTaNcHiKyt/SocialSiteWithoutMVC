@@ -31,12 +31,10 @@ public class UserService(UserRepository repository, JwtService jwtService)
         
         var hasher = new PasswordHasher<UserEntity>().VerifyHashedPassword(userInDb, userInDb.Password, password);
 
-        if (hasher == PasswordVerificationResult.Success)
-        {
-            var token = jwtService.GenerateToken(userInDb);
-            return (true, token);
-        }
-        return (false, null);
+        if (hasher != PasswordVerificationResult.Success) 
+            return (false, null);
+        var token = jwtService.GenerateToken(userInDb);
+        return (true, token);
     }
 
     public async Task Delete(string login,  string password)

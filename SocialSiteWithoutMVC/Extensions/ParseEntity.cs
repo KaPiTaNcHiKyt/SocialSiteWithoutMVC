@@ -25,6 +25,16 @@ public static class ParseEntity
         return chatModel;
     }
     
+    public static ChatModel ToModelWithoutMessages(this ChatEntity chat)
+    {
+        var chatModel = new ChatModel
+        {
+            UsersLogins = chat.Users.Select(u => u.Login).ToArray()
+        };
+        
+        return chatModel;
+    }
+    
     public static MessageModel ToModel(this MessageEntity message)
     {
         var chatModel = new MessageModel

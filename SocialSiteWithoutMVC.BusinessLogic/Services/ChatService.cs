@@ -32,9 +32,7 @@ public class ChatService(ChatRepository chatRepository, UserRepository userRepos
                 }
             ]
         };
-        
         await chatRepository.AddNew(chat, loginFrom, loginTo);
-        
         return true;
     }
 
@@ -44,7 +42,9 @@ public class ChatService(ChatRepository chatRepository, UserRepository userRepos
         {
             Text = text
         };
-        
         await messageRepository.AddMessage(message, loginFrom, loginTo);
     }
+
+    public async Task<ChatEntity[]?> GetAllByLogin(string resultTestCookie)
+        => await chatRepository.GetAllByLogin(resultTestCookie);
 }
