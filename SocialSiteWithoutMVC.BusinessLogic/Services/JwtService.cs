@@ -27,4 +27,16 @@ public class JwtService(IOptions<AuthSettings> options)
         
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
+
+    public string? GetLogin(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        
+        var jwtToken = handler.ReadJwtToken(token);
+        
+        return jwtToken.Claims
+            .Where(c => c.Type == "Login")
+            .Select(c => c.Value)
+            .FirstOrDefault();
+    }
 }

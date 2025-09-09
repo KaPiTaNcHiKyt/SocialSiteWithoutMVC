@@ -35,7 +35,6 @@ public class UserRepository(SocialSiteDbContext context) : IRepository
     {
         var user = await context.Users
             .AsNoTracking()
-            .Include(u => u.Chats)
             .Where(u => u.Login == login)
             .FirstOrDefaultAsync();
         return user;
