@@ -5,6 +5,7 @@ using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.Extensions;
 using SocialSiteWithoutMVC.Interfaces;
 using SocialSiteWithoutMVC.Models;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SocialSiteWithoutMVC.Controllers;
 
@@ -41,9 +42,11 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         return NotFound();
     }
 
+    [SwaggerIgnore]
     public bool MainTests()
         => context.HttpContext is not null;
 
+    [SwaggerIgnore]
     public (bool isConfirmTest, string? resultCookie) MainTests(string cookieName)
     {
         if (context.HttpContext is null)
