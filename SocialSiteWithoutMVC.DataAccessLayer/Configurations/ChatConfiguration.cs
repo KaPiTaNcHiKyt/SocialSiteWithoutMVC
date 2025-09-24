@@ -8,9 +8,7 @@ public class ChatConfiguration : IEntityTypeConfiguration<ChatEntity>
 {
     public void Configure(EntityTypeBuilder<ChatEntity> builder)
     {
-        builder.HasKey(c => c.ChatId);
-
-        builder.Property(c => c.ChatId).ValueGeneratedOnAdd();
+        builder.HasKey(c => c.Id);
 
         builder
             .HasMany(c => c.Users)

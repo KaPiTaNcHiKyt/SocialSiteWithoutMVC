@@ -9,7 +9,7 @@ public static class ParseEntity
     {
         return new UserModel
         {
-            Nickname = user.NickName,
+            Nickname = user.Nickname,
             Login = user.Login
         };
     }

@@ -17,20 +17,20 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.0-rc.1.24451.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ChatEntityUserEntity", b =>
                 {
-                    b.Property<int>("ChatsChatId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ChatsId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("UsersLogin")
                         .HasColumnType("text");
 
-                    b.HasKey("ChatsChatId", "UsersLogin");
+                    b.HasKey("ChatsId", "UsersLogin");
 
                     b.HasIndex("UsersLogin");
 
@@ -39,27 +39,23 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
 
             modelBuilder.Entity("SocialSiteWithoutMVC.DataAccessLayer.Models.ChatEntity", b =>
                 {
-                    b.Property<int>("ChatId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ChatId"));
-
-                    b.HasKey("ChatId");
+                    b.HasKey("Id");
 
                     b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("SocialSiteWithoutMVC.DataAccessLayer.Models.MessageEntity", b =>
                 {
-                    b.Property<int>("MessageId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
-
-                    b.Property<int>("ChatId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ChatId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
@@ -68,7 +64,7 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("MessageId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ChatId");
 
@@ -80,7 +76,7 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                     b.Property<string>("Login")
                         .HasColumnType("text");
 
-                    b.Property<string>("NickName")
+                    b.Property<string>("Nickname")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -97,7 +93,7 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 {
                     b.HasOne("SocialSiteWithoutMVC.DataAccessLayer.Models.ChatEntity", null)
                         .WithMany()
-                        .HasForeignKey("ChatsChatId")
+                        .HasForeignKey("ChatsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

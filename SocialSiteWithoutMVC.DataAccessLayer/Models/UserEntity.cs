@@ -1,12 +1,9 @@
-using SocialSiteWithoutMVC.DataAccessLayer.Interfaces;
-
 namespace SocialSiteWithoutMVC.DataAccessLayer.Models;
 
-public class UserEntity 
-    : IEntity
+public record UserEntity
 {
-    public string NickName { get; set; }
+    public string Nickname { get; set; }
     public string Login { get; set; }
     public string Password { get; set; }
     public List<ChatEntity>? Chats { get; set; }
-}
+};

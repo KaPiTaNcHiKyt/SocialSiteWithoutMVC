@@ -21,13 +21,10 @@ public class MeController(UserService userService, EditUserService editUserServi
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest();
-
-        var me = await userService.GetMe(resultTest.resultCookie!);
+        var me = await userService.GetUser(resultTest.resultCookie!);
         var myChats = await chatService.GetAllByLogin(resultTest.resultCookie!);
-
         var meModel = me.ToModel();
         meModel.ChatModels = myChats?.Select(c => c.ToModelWithoutMessages()).ToArray();
-
         return Ok(meModel);
     }
     
@@ -37,9 +34,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest();
-        
         await editUserService.PatchPassword(resultTest.resultCookie!, newPassword);
-        
         return Ok();
     }
     
@@ -49,20 +44,16 @@ public class MeController(UserService userService, EditUserService editUserServi
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest();
-
         await editUserService.PatchNickname(resultTest.resultCookie!, newNickName);
-        
         return Ok();
     }
     
     [HttpDelete("[action]")]
-    public async Task<IActionResult> DeleteAccount(string login, string password)
+    public async Task<IActionResult> DeleteAccount([Required] string login, [Required] string password)
     {
         if (!MainTests())
             return BadRequest();
-        
         context.HttpContext!.Response.Cookies.Delete("tasty-cookies");
-        
         await userService.Delete(login, password);
         return Ok();
     }
@@ -76,11 +67,9 @@ public class MeController(UserService userService, EditUserService editUserServi
     {
         if (context.HttpContext is null)
             return (false, null);
-
         var jwt = context.HttpContext.Request.Cookies[cookieName];
         if (jwt is null || jwtService.GetLogin(jwt) is not { } login)
             return (false, null);
-        
         return (true, login);
     }
 }

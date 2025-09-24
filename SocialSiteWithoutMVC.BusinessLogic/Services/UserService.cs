@@ -1,59 +1,75 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SocialSiteWithoutMVC.DataAccessLayer;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
-using SocialSiteWithoutMVC.DataAccessLayer.Repositories;
 
 namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
-public class UserService(UserRepository repository, JwtService jwtService)
+public class UserService(JwtService jwtService, SocialSiteDbContext context)
 {
     public async Task<bool> Add(string login, string password, string nickname)
     {
+        if (await context.Users
+            .AsNoTracking()
+            .Where(u => u.Login == login)
+            .AnyAsync())
+        {
+            return false;
+        }
         var user = new UserEntity
         {
             Login = login,
             Password = password,
-            NickName = nickname
+            Nickname = nickname
         };
-        
-        if (await repository.IsInDataBase(user.Login)) 
-            return false;
         user.Password = new PasswordHasher<UserEntity>().HashPassword(user, password);
-        
-        await repository.AddNew(user);
+        await context.Users.AddAsync(user);
+        await context.SaveChangesAsync();
         return true;
     }
 
     public async Task<(bool, string?)> Login(string login, string password)
     {
-        var userInDb = await repository.GetByLogin(login);
-        if (userInDb is null) 
+        var user = await GetUser(login);
+        if (user is null)
+        {
             return (false, null);
-        
-        var hasher = new PasswordHasher<UserEntity>().VerifyHashedPassword(userInDb, userInDb.Password, password);
-
+        }
+        var hasher = new PasswordHasher<UserEntity>().VerifyHashedPassword(user, user.Password, password);
         if (hasher != PasswordVerificationResult.Success) 
             return (false, null);
-        var token = jwtService.GenerateToken(userInDb);
+        var token = jwtService.GenerateToken(user);
         return (true, token);
     }
 
-    public async Task Delete(string login,  string password)
+    public async Task Delete(string login, string password)
     {
-        var userInDb = await repository.GetByLogin(login);
+        var userInDb = await GetUser(login);
         if (userInDb is null)
             return;
-        
         var hasher = new PasswordHasher<UserEntity>().VerifyHashedPassword(userInDb, userInDb.Password, password);
-
-        if (hasher == PasswordVerificationResult.Success)
+        if (hasher != PasswordVerificationResult.Success)
         {
-            await repository.DeleteByDate(userInDb);
+            return;
         }
+        await context.Users
+            .Where(u => u.Login == login)
+            .ExecuteDeleteAsync();
     }
 
     public async Task<UserEntity[]?> GetByFilter(string filter)
-        => await repository.GetByFilter(filter);
+    {
+        return await context.Users
+            .AsNoTracking()
+            .Where(u => u.Login.Contains(filter))
+            .ToArrayAsync();
+    }
 
-    public async Task<UserEntity> GetMe(string login)
-        => (await repository.GetByLogin(login))!;
+    public async Task<UserEntity?> GetUser(string login)
+    {
+        return await context.Users
+            .AsNoTracking()
+            .Where(u => u.Login == login)
+            .FirstOrDefaultAsync();
+    }
 }

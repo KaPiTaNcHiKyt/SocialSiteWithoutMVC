@@ -1,13 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstMigration : Migration
+    public partial class Withoutbugsandmoreerrors : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,12 +15,11 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 name: "Chats",
                 columns: table => new
                 {
-                    ChatId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chats", x => x.ChatId);
+                    table.PrimaryKey("PK_Chats", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -29,7 +27,7 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 columns: table => new
                 {
                     Login = table.Column<string>(type: "text", nullable: false),
-                    NickName = table.Column<string>(type: "text", nullable: false),
+                    Nickname = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -41,20 +39,19 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    MessageId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Text = table.Column<string>(type: "text", nullable: false),
-                    ChatId = table.Column<int>(type: "integer", nullable: false)
+                    ChatId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.MessageId);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Messages_Chats_ChatId",
                         column: x => x.ChatId,
                         principalTable: "Chats",
-                        principalColumn: "ChatId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -62,17 +59,17 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 name: "ChatEntityUserEntity",
                 columns: table => new
                 {
-                    ChatsChatId = table.Column<int>(type: "integer", nullable: false),
+                    ChatsId = table.Column<Guid>(type: "uuid", nullable: false),
                     UsersLogin = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatEntityUserEntity", x => new { x.ChatsChatId, x.UsersLogin });
+                    table.PrimaryKey("PK_ChatEntityUserEntity", x => new { x.ChatsId, x.UsersLogin });
                     table.ForeignKey(
-                        name: "FK_ChatEntityUserEntity_Chats_ChatsChatId",
-                        column: x => x.ChatsChatId,
+                        name: "FK_ChatEntityUserEntity_Chats_ChatsId",
+                        column: x => x.ChatsId,
                         principalTable: "Chats",
-                        principalColumn: "ChatId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ChatEntityUserEntity_Users_UsersLogin",

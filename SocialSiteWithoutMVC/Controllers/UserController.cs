@@ -11,7 +11,7 @@ namespace SocialSiteWithoutMVC.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(UserService userService, JwtService jwtService, ILogger<UserController> logger, IHttpContextAccessor context) 
+public class UserController(UserService userService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {
     [HttpPost("[action]")]
@@ -22,12 +22,9 @@ public class UserController(UserService userService, JwtService jwtService, ILog
     public async Task<ActionResult> Login([Required] string login, [Required] string password)
     {
         var user = await userService.Login(login, password);
-
-        if (!user.Item1 || context.HttpContext is null) 
+        if (!user.Item1 || !MainTests()) 
             return BadRequest();
-
-        context.HttpContext.Response.Cookies.Append("tasty-cookies", user.Item2!);
-
+        context.HttpContext!.Response.Cookies.Append("tasty-cookies", user.Item2!);
         return Ok();
     }
 
@@ -37,9 +34,7 @@ public class UserController(UserService userService, JwtService jwtService, ILog
     {
         if (!MainTests())
             return BadRequest();
-        
         var user = await userService.GetByFilter(filter);
-        
         return Ok(user?
             .Select(u => u.ToModel())
             .OrderBy(u => u.Login)
@@ -52,7 +47,6 @@ public class UserController(UserService userService, JwtService jwtService, ILog
     {
         if (!MainTests())
             return BadRequest();
-        
         context.HttpContext!.Response.Cookies.Delete("tasty-cookies");
         return Ok();
     }
@@ -66,11 +60,9 @@ public class UserController(UserService userService, JwtService jwtService, ILog
     {
         if (context.HttpContext is null)
             return (false, null);
-
         var jwt = context.HttpContext.Request.Cookies[cookieName];
         if (jwt is null || jwtService.GetLogin(jwt) is not { } login)
             return (false, null);
-        
         return (true, login);
     }
 }

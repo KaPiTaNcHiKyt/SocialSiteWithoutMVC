@@ -21,9 +21,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        
         var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, loginTo);
-        
         return resultAdd ? Ok() : BadRequest();
     }
 
@@ -33,12 +31,9 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        
         var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
-        
         if (chat is not null)
             return Ok(chat.ToModel());
-        
         return NotFound();
     }
 
@@ -51,11 +46,9 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     {
         if (context.HttpContext is null)
             return (false, null);
-
         var jwt = context.HttpContext.Request.Cookies[cookieName];
         if (jwt is null || jwtService.GetLogin(jwt) is not { } login)
             return (false, null);
-        
         return (true, login);
     }
 }

@@ -1,13 +1,11 @@
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.EntityFrameworkCore;
 using SocialSiteWithoutMVC.BusinessLogic;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.BusinessLogic.Settings;
 using SocialSiteWithoutMVC.DataAccessLayer;
-using SocialSiteWithoutMVC.DataAccessLayer.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -22,23 +20,26 @@ builder.Services.AddDbContext<SocialSiteDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDataProtection().UseCryptographicAlgorithms(
+    new AuthenticatedEncryptorConfiguration
+    {
+        EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+        ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+    });
+
 builder.Services.Configure<AuthSettings>(
     builder.Configuration.GetSection("AuthSettings"));
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddApiAuthentification(builder.Configuration);
-
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<ChatRepository>();
-builder.Services.AddScoped<MessageRepository>();
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<EditUserService>();
+
+builder.Services.AddApiAuthentification(builder.Configuration);
 
 var app = builder.Build();
 
