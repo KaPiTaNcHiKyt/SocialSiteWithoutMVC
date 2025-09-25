@@ -12,7 +12,7 @@ namespace SocialSiteWithoutMVC.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ChatsController(ChatService chatService, JwtService jwtService, IHttpContextAccessor context) 
+public class ChatsController(ChatService chatService, JwtService jwtService, IHttpContextAccessor context) try add cache
     : ControllerBase, ITestings
 {
     [HttpPost("[action]")]
@@ -26,7 +26,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     }
 
     [HttpGet("[action]")]
-    public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo)
+    public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo) document errorcodes for swagger
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)

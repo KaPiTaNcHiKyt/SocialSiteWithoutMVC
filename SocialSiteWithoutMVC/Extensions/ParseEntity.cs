@@ -3,7 +3,7 @@ using SocialSiteWithoutMVC.Models;
 
 namespace SocialSiteWithoutMVC.Extensions;
 
-public static class ParseEntity
+public static class ParseEntity try use mapperly
 {
     public static UserModel ToModel(this UserEntity user)
     {

@@ -11,7 +11,7 @@ public static class AuthExtensions
 {
     public static void AddApiAuthentification(this IServiceCollection services, IConfiguration configuration)
     {
-        var authSettings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
+        var authSettings = configuration.GetSection("AuthSettings").Get<AuthSettings>(); use IOptions instead
         
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

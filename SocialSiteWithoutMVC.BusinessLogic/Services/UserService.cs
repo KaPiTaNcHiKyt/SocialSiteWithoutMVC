@@ -5,7 +5,7 @@ using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
 namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
-public class UserService(JwtService jwtService, SocialSiteDbContext context)
+public class UserService(JwtService jwtService, SocialSiteDbContext context) internal, sealed, extract interface
 {
     public async Task<bool> Add(string login, string password, string nickname)
     {

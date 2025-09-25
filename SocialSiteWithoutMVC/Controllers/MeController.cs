@@ -16,7 +16,7 @@ public class MeController(UserService userService, EditUserService editUserServi
     : ControllerBase, ITestings
 {
     [HttpGet("[action]")]
-    public async Task<ActionResult<(UserModel, ChatModel)>> GetMe()
+    public async Task<ActionResult<(UserModel, ChatModel)>> GetMe() use [FromService] instead of constructor injection for services only used in one method
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
