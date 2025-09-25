@@ -8,7 +8,7 @@ using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
 namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
-public class JwtService(IOptions<AuthSettings> options)
+public class JwtService(IOptions<AuthSettings> options) internal, sealed, extract interface
 {
     public string GenerateToken(UserEntity user)
     {
