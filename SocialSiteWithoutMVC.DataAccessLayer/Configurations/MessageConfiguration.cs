@@ -15,5 +15,10 @@ public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
             .HasOne(m => m.Chat)
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ChatId);
+
+        builder
+            .HasOne(m => m.User)
+            .WithOne()
+            .HasForeignKey<UserEntity>(u => u.Login);
     }
 }
