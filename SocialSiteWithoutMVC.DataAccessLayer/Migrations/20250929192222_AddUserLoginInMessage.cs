@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class Withoutbugsandmoreerrors : Migration
+    public partial class AddUserLoginInMessage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,26 +36,6 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Text = table.Column<string>(type: "text", nullable: false),
-                    ChatId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_Chats_ChatId",
-                        column: x => x.ChatId,
-                        principalTable: "Chats",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ChatEntityUserEntity",
                 columns: table => new
                 {
@@ -79,6 +59,33 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Text = table.Column<string>(type: "text", nullable: false),
+                    ChatId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserLogin = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Chats_ChatId",
+                        column: x => x.ChatId,
+                        principalTable: "Chats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_UserLogin",
+                        column: x => x.UserLogin,
+                        principalTable: "Users",
+                        principalColumn: "Login",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ChatEntityUserEntity_UsersLogin",
                 table: "ChatEntityUserEntity",
@@ -88,6 +95,12 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 name: "IX_Messages_ChatId",
                 table: "Messages",
                 column: "ChatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_UserLogin",
+                table: "Messages",
+                column: "UserLogin",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -100,10 +113,10 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Chats");
 
             migrationBuilder.DropTable(
-                name: "Chats");
+                name: "Users");
         }
     }
 }

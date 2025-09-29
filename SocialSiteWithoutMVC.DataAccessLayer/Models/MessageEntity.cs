@@ -7,5 +7,5 @@ public record MessageEntity
     public string Text { get; set; }
     public Guid ChatId { get; set; }
     public ChatEntity Chat { get; set; }
-    public string User { get; set; }
+    public string UserLogin { get; set; }
 }

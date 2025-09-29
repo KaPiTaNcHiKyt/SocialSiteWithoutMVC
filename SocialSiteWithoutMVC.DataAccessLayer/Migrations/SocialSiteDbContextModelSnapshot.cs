@@ -64,9 +64,16 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("UserLogin")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
+
+                    b.HasIndex("UserLogin")
+                        .IsUnique();
 
                     b.ToTable("Messages");
                 });
@@ -109,6 +116,12 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                     b.HasOne("SocialSiteWithoutMVC.DataAccessLayer.Models.ChatEntity", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialSiteWithoutMVC.DataAccessLayer.Models.UserEntity", null)
+                        .WithOne()
+                        .HasForeignKey("SocialSiteWithoutMVC.DataAccessLayer.Models.MessageEntity", "UserLogin")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
