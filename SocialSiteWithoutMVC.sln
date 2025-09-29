@@ -6,6 +6,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialSiteWithoutMVC.Busine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialSiteWithoutMVC.DataAccessLayer", "SocialSiteWithoutMVC.DataAccessLayer\SocialSiteWithoutMVC.DataAccessLayer.csproj", "{1DD98C8B-A1D8-471E-9F16-1DD94494C412}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{DCCF26F4-1C14-4248-979F-2624896EDFDA}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
