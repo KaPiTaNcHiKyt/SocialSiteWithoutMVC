@@ -14,11 +14,13 @@ public static class ParseEntity
         };
     }
     
-    public static ChatModel ToModel(this ChatEntity chat)
+    public static ChatModel ToModel(this ChatEntity chat, string thisLogin)
     {
         var chatModel = new ChatModel
         {
-            UsersLogins = chat.Users.Select(u => u.Login).ToArray(),
+            UsersLogin = chat.Users
+                .Where(u => u.Login != thisLogin)
+                .Select(u => u.Login).ToArray(),
             Messages = chat.Messages!.Select(m => m.ToModel()).ToArray()
         };
         
@@ -29,7 +31,7 @@ public static class ParseEntity
     {
         var chatModel = new ChatModel
         {
-            UsersLogins = chat.Users.Select(u => u.Login).ToArray()
+            UsersLogin = chat.Users.Select(u => u.Login).ToArray()
         };
         
         return chatModel;
@@ -37,12 +39,13 @@ public static class ParseEntity
     
     public static MessageModel ToModel(this MessageEntity message)
     {
-        var chatModel = new MessageModel
+        var messageModel = new MessageModel
         {
             DateTime = message.DateTime,
-            Text = message.Text
+            Text = message.Text,
+            UserLogin = message.UserLogin
         };
         
-        return chatModel;
+        return messageModel;
     }
 }

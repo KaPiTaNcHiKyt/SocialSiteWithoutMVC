@@ -2,6 +2,6 @@ namespace SocialSiteWithoutMVC.Models;
 
 public class ChatModel
 {
-    public string[] UsersLogins { get; set; }
+    public string[] UsersLogin { get; set; }
     public MessageModel[] Messages { get; set; }
 }

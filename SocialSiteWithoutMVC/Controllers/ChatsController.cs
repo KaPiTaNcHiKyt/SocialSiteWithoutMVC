@@ -33,7 +33,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
             return BadRequest("Cookie not found, authorize again");
         var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
         if (chat is not null)
-            return Ok(chat.ToModel());
+            return Ok(chat.ToModel(resultTest.resultCookie!));
         return NotFound();
     }
 

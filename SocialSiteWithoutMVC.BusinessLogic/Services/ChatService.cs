@@ -28,7 +28,8 @@ public class ChatService(SocialSiteDbContext context)
                     new MessageEntity
                     {
                         Text = text,
-                        Id = Guid.NewGuid()
+                        Id = Guid.NewGuid(),
+                        UserLogin = loginFrom
                     }
                 ],
                 Id = Guid.NewGuid()
@@ -45,7 +46,8 @@ public class ChatService(SocialSiteDbContext context)
             chat.Messages!.Add(new MessageEntity
             {
                 Id = Guid.NewGuid(),
-                Text = text
+                Text = text,
+                UserLogin = loginFrom
             });
         }
         await context.SaveChangesAsync();
