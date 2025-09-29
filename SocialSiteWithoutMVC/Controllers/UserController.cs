@@ -10,15 +10,15 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace SocialSiteWithoutMVC.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/UserController")]
 public class UserController(UserService userService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {
-    [HttpPost("[action]")]
+    [HttpPost("PostUser")]
     public async Task<IActionResult> PostUser([Required] string login, [Required] string password, [Required] string nickname)
         => await userService.Add(login, password, nickname) ? Ok() : BadRequest();
     
-    [HttpPost("[action]")]
+    [HttpPost("Login")]
     public async Task<ActionResult> Login([Required] string login, [Required] string password)
     {
         var user = await userService.Login(login, password);
@@ -29,7 +29,7 @@ public class UserController(UserService userService, JwtService jwtService, IHtt
     }
 
     [Authorize]
-    [HttpGet("[action]")]
+    [HttpGet("GetUsersByFilter")]
     public async Task<ActionResult<UserModel[]?>> GetUsers(string filter = "") // string.Empty
     {
         if (!MainTests())
@@ -42,7 +42,7 @@ public class UserController(UserService userService, JwtService jwtService, IHtt
     }
     
     [Authorize]
-    [HttpDelete("[action]")]
+    [HttpDelete("Logout")]
     public IActionResult Logout()
     {
         if (!MainTests())

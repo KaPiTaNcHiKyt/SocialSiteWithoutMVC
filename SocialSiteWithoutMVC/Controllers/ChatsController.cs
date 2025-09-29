@@ -10,12 +10,12 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace SocialSiteWithoutMVC.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/Chats")]
 [Authorize]
 public class ChatsController(ChatService chatService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {
-    [HttpPost("[action]")]
+    [HttpPost("SendMessage")]
     public async Task<IActionResult> SendMessage([Required] string text, [Required] string loginTo)
     {
         var resultTest = MainTests("tasty-cookies");
@@ -25,7 +25,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         return resultAdd ? Ok() : BadRequest();
     }
 
-    [HttpGet("[action]")]
+    [HttpGet("GetChatByUserLogin")]
     public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo)
     {
         var resultTest = MainTests("tasty-cookies");

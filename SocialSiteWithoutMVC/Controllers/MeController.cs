@@ -10,12 +10,12 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace SocialSiteWithoutMVC.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/MeController")]
 [Authorize]
 public class MeController(UserService userService, EditUserService editUserService, ChatService chatService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {
-    [HttpGet("[action]")]
+    [HttpGet("GetMe")]
     public async Task<ActionResult<(UserModel, ChatModel)>> GetMe()
     {
         var resultTest = MainTests("tasty-cookies");
@@ -28,7 +28,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         return Ok(meModel);
     }
     
-    [HttpPatch("[action]")]
+    [HttpPatch("EditPassword")]
     public async Task<IActionResult> EditPassword([Required] string newPassword)
     {
         var resultTest = MainTests("tasty-cookies");
@@ -38,7 +38,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         return Ok();
     }
     
-    [HttpPatch("[action]")]
+    [HttpPatch("EditNickname")]
     public async Task<IActionResult> EditNickname([Required] string newNickName)
     {
         var resultTest = MainTests("tasty-cookies");
@@ -48,7 +48,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         return Ok();
     }
     
-    [HttpDelete("[action]")]
+    [HttpDelete("DeleteThisAccount")]
     public async Task<IActionResult> DeleteAccount([Required] string login, [Required] string password)
     {
         if (!MainTests())
