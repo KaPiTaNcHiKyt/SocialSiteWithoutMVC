@@ -113,7 +113,7 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
 
             modelBuilder.Entity("SocialSiteWithoutMVC.DataAccessLayer.Models.MessageEntity", b =>
                 {
-                    b.HasOne("SocialSiteWithoutMVC.DataAccessLayer.Models.ChatEntity", "Chat")
+                    b.HasOne("SocialSiteWithoutMVC.DataAccessLayer.Models.ChatEntity", null)
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -124,8 +124,6 @@ namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
                         .HasForeignKey("SocialSiteWithoutMVC.DataAccessLayer.Models.MessageEntity", "UserLogin")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("SocialSiteWithoutMVC.DataAccessLayer.Models.ChatEntity", b =>
