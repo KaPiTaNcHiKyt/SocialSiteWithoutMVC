@@ -5,7 +5,7 @@
 namespace SocialSiteWithoutMVC.DataAccessLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class WithoutReferenceFromMessageToChat : Migration
+    public partial class TestForeignKeyFromChatToMessage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
