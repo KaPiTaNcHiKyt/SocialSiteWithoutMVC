@@ -16,7 +16,6 @@ public class ChatConfiguration : IEntityTypeConfiguration<ChatEntity>
 
         builder
             .HasMany(c => c.Messages)
-            .WithOne(m => m.Chat)
-            .HasForeignKey(m => m.ChatId);
+            .WithOne();
     }
 }

@@ -12,7 +12,7 @@ public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
         builder.HasKey(m => m.Id);
 
         builder
-            .HasOne(m => m.Chat)
+            .HasOne<ChatEntity>()
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ChatId);
 
