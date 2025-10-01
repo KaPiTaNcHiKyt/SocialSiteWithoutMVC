@@ -10,6 +10,8 @@ public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
     public void Configure(EntityTypeBuilder<MessageEntity> builder)
     {
         builder.HasKey(m => m.Id);
+        builder.HasIndex(m => m.ChatId).IsUnique(false);
+        builder.HasIndex(m => m.UserLogin).IsUnique(false);
 
         builder
             .HasOne<ChatEntity>()
