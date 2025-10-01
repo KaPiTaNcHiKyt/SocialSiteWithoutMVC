@@ -12,6 +12,7 @@ public class ChatService(SocialSiteDbContext context)
             .Where(c =>
                 (c.Users[0].Login == loginFrom && c.Users[1].Login == loginTo) ||
                 (c.Users[1].Login == loginFrom && c.Users[0].Login == loginTo))
+            .Include(c => c.Messages)
             .FirstOrDefaultAsync();
         if (chat == null)
         {
@@ -43,12 +44,14 @@ public class ChatService(SocialSiteDbContext context)
         }
         else
         {
-            chat.Messages!.Add(new MessageEntity
+            var newMessage = new MessageEntity
             {
                 Id = Guid.NewGuid(),
                 Text = text,
                 UserLogin = loginFrom
-            });
+            };
+            chat.Messages!.Add(newMessage);
+            context.Messages.Add(newMessage);
         }
         await context.SaveChangesAsync();
         return true;
