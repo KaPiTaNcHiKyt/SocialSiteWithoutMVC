@@ -14,24 +14,29 @@ public static class ParseEntity
         };
     }
     
-    public static ChatModel ToModel(this ChatEntity chat, string thisLogin)
+    public static ChatModel ToModel(this ChatEntity chat, string thisLogin = "") // string.Empty
     {
         var chatModel = new ChatModel
         {
             UsersLogin = chat.Users
                 .Where(u => u.Login != thisLogin)
                 .Select(u => u.Login).ToArray(),
-            Messages = chat.Messages!.Select(m => m.ToModel()).ToArray()
+            Messages = chat.Messages!
+                .Select(m => m.ToModel())
+                .ToArray()
         };
         
         return chatModel;
     }
     
-    public static ChatModel ToModelWithoutMessages(this ChatEntity chat)
+    public static ChatModel ToModelWithoutMessages(this ChatEntity chat, string thisLogin = "") // string.Empty
     {
         var chatModel = new ChatModel
         {
-            UsersLogin = chat.Users.Select(u => u.Login).ToArray()
+            UsersLogin = chat.Users
+                .Where(u => u.Login != thisLogin)
+                .Select(u => u.Login)
+                .ToArray()
         };
         
         return chatModel;

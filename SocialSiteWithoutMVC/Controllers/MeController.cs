@@ -23,8 +23,10 @@ public class MeController(UserService userService, EditUserService editUserServi
             return BadRequest();
         var me = await userService.GetUser(resultTest.resultCookie!);
         var myChats = await chatService.GetAllByLogin(resultTest.resultCookie!);
-        var meModel = me.ToModel();
-        meModel.ChatModels = myChats?.Select(c => c.ToModelWithoutMessages()).ToArray();
+        var meModel = me!.ToModel();
+        meModel.ChatModels = myChats?
+            .Select(c => c.ToModelWithoutMessages(resultTest.resultCookie!))
+            .ToArray();
         return Ok(meModel);
     }
     
