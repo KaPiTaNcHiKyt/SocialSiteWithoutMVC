@@ -12,11 +12,11 @@ namespace SocialSiteWithoutMVC.Controllers;
 [ApiController]
 [Route("api/MeController")]
 [Authorize]
-public class MeController(UserService userService, EditUserService editUserService, ChatService chatService, JwtService jwtService, IHttpContextAccessor context) 
+public class MeController(UserService userService, EditUserService editUserService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {
     [HttpGet("GetMe")]
-    public async Task<ActionResult<(UserModel, ChatModel)>> GetMe()
+    public async Task<ActionResult<UserModel>> GetMe([FromServices] ChatService chatService)
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
