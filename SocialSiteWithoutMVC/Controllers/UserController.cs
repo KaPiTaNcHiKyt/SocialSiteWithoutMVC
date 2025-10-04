@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.Extensions;
 using SocialSiteWithoutMVC.Interfaces;
+using SocialSiteWithoutMVC.Mapper;
 using SocialSiteWithoutMVC.Models;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -36,7 +37,7 @@ public class UserController(UserService userService, JwtService jwtService, IHtt
             return BadRequest();
         var user = await userService.GetByFilter(filter);
         return Ok(user?
-            .Select(u => u.ToModel())
+            .Select(ModelMapper.UserEntityToModel)
             .OrderBy(u => u.Login)
             .ToArray());
     }

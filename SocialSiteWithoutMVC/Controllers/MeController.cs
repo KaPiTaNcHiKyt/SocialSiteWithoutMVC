@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.Extensions;
 using SocialSiteWithoutMVC.Interfaces;
+using SocialSiteWithoutMVC.Mapper;
 using SocialSiteWithoutMVC.Models;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -22,11 +23,14 @@ public class MeController(UserService userService, EditUserService editUserServi
         if (!resultTest.isConfirmTest)
             return BadRequest();
         var me = await userService.GetUser(resultTest.resultCookie!);
+        if (me is null)
+            return NotFound();
         var myChats = await chatService.GetAllByLogin(resultTest.resultCookie!);
-        var meModel = me!.ToModel();
-        meModel.ChatModels = myChats?
-            .Select(c => c.ToModelWithoutMessages(resultTest.resultCookie!))
-            .ToArray();
+        var meModel = ModelMapper.UserEntityToModel(me);
+        meModel.Chats = myChats?
+            .Select(c => 
+                ModelMapper.ChatEntityToModelWithoutMessages(c, resultTest.resultCookie!))
+            .ToList();
         return Ok(meModel);
     }
     
