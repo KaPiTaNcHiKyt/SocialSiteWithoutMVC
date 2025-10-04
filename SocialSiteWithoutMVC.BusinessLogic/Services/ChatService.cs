@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.DataAccessLayer;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
 namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
-public class ChatService(SocialSiteDbContext context)
+public class ChatService(SocialSiteDbContext context, IMemoryCache cache)
 {
     public async Task<bool> AddMessage(string text, string loginFrom, string loginTo)
     {
@@ -59,7 +60,9 @@ public class ChatService(SocialSiteDbContext context)
 
     public async Task<ChatEntity?> GetChat(string loginFrom, string loginTo)
     {
-        return await context.Chats
+        if (cache.TryGetValue($"{loginFrom}{loginTo}", out ChatEntity? chat))
+            return chat;
+        chat = await context.Chats
             .AsNoTracking()
             .Where(c =>
                 (c.Users[0].Login == loginFrom && c.Users[1].Login == loginTo) ||
@@ -67,14 +70,28 @@ public class ChatService(SocialSiteDbContext context)
             .Include(c => c.Users)
             .Include(c => c.Messages)
             .FirstOrDefaultAsync();
+        if (chat != null)
+        {
+            cache.Set($"{loginFrom}_{loginTo}", chat, new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromSeconds(2)));
+        }
+        return chat;
     }
 
     public async Task<ChatEntity[]?> GetAllByLogin(string myLogin)
     {
-        return await context.Chats
+        if (cache.TryGetValue($"{myLogin}", out ChatEntity[]? chats))
+            return chats;
+        chats = await context.Chats
             .AsNoTracking()
             .Include(c => c.Users)
             .Where(c => c.Users.Any(u => u.Login == myLogin))
             .ToArrayAsync();
+        if (chats.Length == 0)
+        {
+            cache.Set($"{myLogin}", chats, new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(1)));
+        }
+        return chats;
     }
 }

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.Interfaces;
 using SocialSiteWithoutMVC.Mapper;
@@ -16,20 +17,24 @@ public class MeController(UserService userService, EditUserService editUserServi
     : ControllerBase, ITestings
 {
     [HttpGet("GetMe")]
-    public async Task<ActionResult<UserModel>> GetMe([FromServices] ChatService chatService)
+    public async Task<ActionResult<UserModel>> GetMe([FromServices] ChatService chatService, [FromServices] IMemoryCache cache)
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest();
+        if (cache.TryGetValue(resultTest.resultCookie!, out UserModel? meModel))
+            return Ok(meModel);
         var me = await userService.GetUser(resultTest.resultCookie!);
         if (me is null)
             return NotFound();
         var myChats = await chatService.GetAllByLogin(resultTest.resultCookie!);
-        var meModel = ModelMapper.UserEntityToModel(me);
+        meModel = ModelMapper.UserEntityToModel(me);
         meModel.Chats = myChats?
             .Select(c => 
                 ModelMapper.ChatEntityToModelWithoutMessages(c, resultTest.resultCookie!))
             .ToList();
+        cache.Set($"{resultTest.resultCookie}", meModel, new MemoryCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
         return Ok(meModel);
     }
     

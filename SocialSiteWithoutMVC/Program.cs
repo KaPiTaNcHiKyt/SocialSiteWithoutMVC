@@ -40,6 +40,7 @@ builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<EditUserService>();
 
 builder.Services.AddApiAuthentification(builder.Configuration);
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
