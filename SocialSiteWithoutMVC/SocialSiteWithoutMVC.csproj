@@ -21,6 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\SocialSiteWithoutMVC.BusinessLogic\SocialSiteWithoutMVC.BusinessLogic.csproj" />
       <ProjectReference Include="..\SocialSiteWithoutMVC.DataAccessLayer\SocialSiteWithoutMVC.DataAccessLayer.csproj" />
+      <ProjectReference Include="..\SocialSiteWithoutMVC.infrastructureLogic\SocialSiteWithoutMVC.infrastructureLogic.csproj" />
     </ItemGroup>
 
 </Project>

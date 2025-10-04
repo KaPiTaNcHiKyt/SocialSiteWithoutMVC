@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SocialSiteWithoutMVC.BusinessLogic.Settings;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
+using SocialSiteWithoutMVC.infrastructureLogic.Settings;
 
-namespace SocialSiteWithoutMVC.BusinessLogic.Services;
+namespace SocialSiteWithoutMVC.infrastructureLogic.Services;
 
 public class JwtService(IOptions<AuthSettings> options)
 {
