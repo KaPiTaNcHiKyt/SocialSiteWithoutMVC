@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.DataAccessLayer;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
 namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
-public class UserService(JwtService jwtService, SocialSiteDbContext context)
+public class UserService(JwtService jwtService, SocialSiteDbContext context, IMemoryCache cache)
 {
     public async Task<bool> Add(string login, string password, string nickname)
     {
@@ -35,7 +37,8 @@ public class UserService(JwtService jwtService, SocialSiteDbContext context)
         {
             return (false, null);
         }
-        var hasher = new PasswordHasher<UserEntity>().VerifyHashedPassword(user, user.Password, password);
+        var hasher = new PasswordHasher<UserEntity>()
+            .VerifyHashedPassword(user, user.Password, password);
         if (hasher != PasswordVerificationResult.Success) 
             return (false, null);
         var token = jwtService.GenerateToken(user);
@@ -47,11 +50,10 @@ public class UserService(JwtService jwtService, SocialSiteDbContext context)
         var userInDb = await GetUser(login);
         if (userInDb is null)
             return;
-        var hasher = new PasswordHasher<UserEntity>().VerifyHashedPassword(userInDb, userInDb.Password, password);
+        var hasher = new PasswordHasher<UserEntity>()
+            .VerifyHashedPassword(userInDb, userInDb.Password, password);
         if (hasher != PasswordVerificationResult.Success)
-        {
             return;
-        }
         await context.Users
             .Where(u => u.Login == login)
             .ExecuteDeleteAsync();
@@ -59,10 +61,18 @@ public class UserService(JwtService jwtService, SocialSiteDbContext context)
 
     public async Task<UserEntity[]?> GetByFilter(string filter)
     {
-        return await context.Users
+        if (cache.TryGetValue($"{filter}_filter", out UserEntity[]? users))
+            return users;
+        users = await context.Users
             .AsNoTracking()
             .Where(u => u.Login.Contains(filter))
             .ToArrayAsync();
+        if (users.Length != 0)
+        {
+            cache.Set($"{filter}_filter", users, new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(1)));
+        }
+        return users;
     }
 
     public async Task<UserEntity?> GetUser(string login)
