@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.Extensions;
 using SocialSiteWithoutMVC.Interfaces;
+using SocialSiteWithoutMVC.Mapper;
 using SocialSiteWithoutMVC.Models;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -33,7 +34,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
             return BadRequest("Cookie not found, authorize again");
         var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
         if (chat is not null)
-            return Ok(chat.ToModel(resultTest.resultCookie!));
+            return Ok(ModelMapper.ChatEntityToModel(chat, resultTest.resultCookie!));
         return NotFound();
     }
 

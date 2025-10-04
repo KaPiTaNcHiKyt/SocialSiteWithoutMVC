@@ -9,6 +9,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{DCCF26F4-1C14-4248-979F-2624896EDFDA}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
+		README.MD = README.MD
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Global
