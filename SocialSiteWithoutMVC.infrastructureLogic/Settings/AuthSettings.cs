@@ -1,4 +1,4 @@
-namespace SocialSiteWithoutMVC.BusinessLogic.Settings;
+namespace SocialSiteWithoutMVC.infrastructureLogic.Settings;
 
 public class AuthSettings
 {

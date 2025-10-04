@@ -2,15 +2,14 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.EntityFrameworkCore;
-using SocialSiteWithoutMVC.BusinessLogic;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
-using SocialSiteWithoutMVC.BusinessLogic.Settings;
 using SocialSiteWithoutMVC.DataAccessLayer;
+using SocialSiteWithoutMVC.infrastructureLogic.Extensions;
+using SocialSiteWithoutMVC.infrastructureLogic.Services;
+using SocialSiteWithoutMVC.infrastructureLogic.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
-
-builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<SocialSiteDbContext>(options =>
