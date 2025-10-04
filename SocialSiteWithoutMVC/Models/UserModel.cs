@@ -4,7 +4,7 @@ namespace SocialSiteWithoutMVC.Models;
 
 public class UserModel
 {
-    public string Nickname { get; set; }
-    public string Login { get; set; }
-    public ChatModel[]? ChatModels { get; set; }
+    public string Nickname { get; set; } = null!;
+    public string Login { get; set; } = null!;
+    public List<ChatModel>? Chats { get; set; }
 }
