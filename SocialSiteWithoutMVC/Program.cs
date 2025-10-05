@@ -29,8 +29,6 @@ builder.Services.AddDataProtection().UseCryptographicAlgorithms(
 builder.Services.Configure<AuthSettings>(
     builder.Configuration.GetSection("AuthSettings"));
 
-builder.Services.AddAuthorization();
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<JwtService>();
@@ -38,6 +36,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<EditUserService>();
 
+builder.Services.AddAuthorization();
 builder.Services.AddApiAuthentification(builder.Configuration);
 builder.Services.AddMemoryCache();
 
