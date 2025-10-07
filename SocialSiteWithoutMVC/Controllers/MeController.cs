@@ -18,22 +18,23 @@ public class MeController(UserService userService, EditUserService editUserServi
     : ControllerBase, ITestings
 {
     [HttpGet("GetMe")]
-    public async Task<ActionResult<UserModel>> GetMe([FromServices] ChatService chatService, [FromServices] IMemoryCache cache)
+    public async Task<ActionResult<UserModel>> GetMe([FromServices] IMemoryCache cache)
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest();
         if (cache.TryGetValue(resultTest.resultCookie!, out UserModel? meModel))
             return Ok(meModel);
-        var me = await userService.GetUser(resultTest.resultCookie!);
-        if (me is null)
-            return NotFound();
-        var myChats = await chatService.GetAllByLogin(resultTest.resultCookie!);
+        var me = await userService.GetMe(resultTest.resultCookie!);
+        if (me == null)
+            return NotFound("User not found");
         meModel = ModelMapper.UserEntityToModel(me);
-        meModel.Chats = myChats?
-            .Select(c => 
-                ModelMapper.ChatEntityToModelWithoutMessages(c, resultTest.resultCookie!))
-            .ToList();
+        if (meModel.Chats == null)
+            return meModel;
+        foreach (var chat in meModel.Chats)
+        {
+            chat.UsersLogin = chat.UsersLogin.Where(l => l != resultTest.resultCookie!).ToArray();
+        }
         cache.Set($"{resultTest.resultCookie}", meModel, new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
         return Ok(meModel);
