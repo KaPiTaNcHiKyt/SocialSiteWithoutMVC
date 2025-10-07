@@ -60,12 +60,13 @@ public class MeController(UserService userService, EditUserService editUserServi
     }
     
     [HttpDelete("DeleteThisAccount")]
-    public async Task<IActionResult> DeleteAccount([Required] string login, [Required] string password)
+    public async Task<IActionResult> DeleteAccount([Required] string password)
     {
-        if (!MainTests())
+        var resultTest = MainTests("tasty-cookies");
+        if (!resultTest.isConfirmTest)
             return BadRequest();
         context.HttpContext!.Response.Cookies.Delete("tasty-cookies");
-        await userService.Delete(login, password);
+        await userService.Delete(resultTest.resultCookie!, password);
         return Ok();
     }
 
