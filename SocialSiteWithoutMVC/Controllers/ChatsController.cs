@@ -33,9 +33,11 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
         var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
-        if (chat is not null)
-            return Ok(ModelMapper.ChatEntityToModel(chat, resultTest.resultCookie!));
-        return NotFound();
+        if (chat == null)
+            return NotFound();
+        var chatModel = ModelMapper.ChatEntityToModel(chat);
+        chatModel.UsersLogin = [loginTo];
+        return Ok(chatModel);
     }
 
     [HttpPost("SendMessageToGroup")]

@@ -37,7 +37,7 @@ public class UserController(UserService userService, JwtService jwtService, IHtt
             return BadRequest();
         var user = await userService.GetByFilter(filter);
         return Ok(user?
-            .Select(ModelMapper.UserEntityToModel)
+            .Select(ModelMapper.UserEntityToModelWithoutChats)
             .OrderBy(u => u.Login)
             .ToArray());
     }
