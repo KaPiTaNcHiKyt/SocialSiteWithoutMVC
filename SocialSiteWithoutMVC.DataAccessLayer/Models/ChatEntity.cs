@@ -4,5 +4,5 @@ public record ChatEntity
 {
     public Guid Id { get; set; }
     public List<UserEntity> Users { get; set; } = null!;
-    public List<MessageEntity>? Messages { get; set; }
+    public List<MessageEntity>? Messages { get; set; } = null!;
 }
