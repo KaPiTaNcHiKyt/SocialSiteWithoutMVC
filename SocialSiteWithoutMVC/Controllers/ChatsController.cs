@@ -22,7 +22,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, loginTo);
+        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, [ loginTo ]);
         return resultAdd ? Ok() : BadRequest();
     }
 
@@ -36,6 +36,16 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         if (chat is not null)
             return Ok(ModelMapper.ChatEntityToModel(chat, resultTest.resultCookie!));
         return NotFound();
+    }
+
+    [HttpPost("SendMessageToGroup")]
+    public async Task<IActionResult> SendMessageToGroup([Required] string text, [Required] params string[] logins)
+    {
+        var resultTest = MainTests("tasty-cookies");
+        if (!resultTest.isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, logins);
+        return resultAdd ? Ok() : BadRequest();
     }
 
     [SwaggerIgnore]
