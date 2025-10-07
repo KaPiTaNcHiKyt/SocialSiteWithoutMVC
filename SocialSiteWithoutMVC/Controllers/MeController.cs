@@ -35,8 +35,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         {
             chat.UsersLogin = chat.UsersLogin.Where(l => l != resultTest.resultCookie!).ToArray();
         }
-        cache.Set($"{resultTest.resultCookie}", meModel, new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+        cache.Set($"{resultTest.resultCookie}", meModel, TimeSpan.FromMinutes(5));
         return Ok(meModel);
     }
     

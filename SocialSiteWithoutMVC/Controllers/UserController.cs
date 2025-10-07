@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.infrastructureLogic.Services;
 using SocialSiteWithoutMVC.Interfaces;
@@ -31,15 +32,19 @@ public class UserController(UserService userService, JwtService jwtService, IHtt
 
     [Authorize]
     [HttpGet("GetUsersByFilter")]
-    public async Task<ActionResult<UserModel[]?>> GetUsers(string filter = "") // string.Empty
+    public async Task<ActionResult<UserModel[]?>> GetUsers([FromServices] IMemoryCache cache, string filter = "") // string.Empty
     {
         if (!MainTests())
             return BadRequest();
+        if (cache.TryGetValue($"users_{filter}", out UserModel[]? users))
+            return Ok(users);
         var user = await userService.GetByFilter(filter);
-        return Ok(user?
+        users = user?
             .Select(ModelMapper.UserEntityToModelWithoutChats)
             .OrderBy(u => u.Login)
-            .ToArray());
+            .ToArray();
+        cache.Set($"users_{filter}", users, TimeSpan.FromMinutes(2));
+        return Ok(users);
     }
     
     [Authorize]
