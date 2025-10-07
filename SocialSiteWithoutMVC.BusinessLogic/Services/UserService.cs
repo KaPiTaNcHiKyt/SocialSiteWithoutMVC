@@ -76,11 +76,29 @@ public class UserService(JwtService jwtService, SocialSiteDbContext context, IMe
         return users;
     }
 
-    public async Task<UserEntity?> GetUser(string login)
+    private async Task<UserEntity?> GetUser(string login)
     {
         return await context.Users
             .AsNoTracking()
             .Where(u => u.Login == login)
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<UserEntity?> GetMe(string login)
+    {
+        var user = await context.Users
+            .AsNoTracking()
+            .Where(u => u.Login == login)
+            .Include(u => u.Chats)
+            .FirstOrDefaultAsync();
+        if (user == null)
+            return null;
+        var chats = await context.Chats
+            .AsNoTracking()
+            .Include(u => u.Users)
+            .Where(c => c.Users.Any(u => u.Login == login))
+            .ToListAsync();
+        user.Chats = chats;
+        return user;
     }
 }
