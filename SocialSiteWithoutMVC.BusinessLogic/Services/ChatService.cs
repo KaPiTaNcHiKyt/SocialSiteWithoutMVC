@@ -24,41 +24,16 @@ public class ChatService(SocialSiteDbContext context, IMemoryCache cache)
         return true;
     }
 
-    public async Task<ChatEntity?> GetChat(string loginFrom, string loginTo)
+    public async Task<ChatEntity?> GetChat(string loginFrom, string[] loginTo)
     {
-        if (cache.TryGetValue($"{loginFrom}{loginTo}", out ChatEntity? chat))
-            return chat;
-        chat = await context.Chats
+        var chat = await context.Chats
             .AsNoTracking()
-            .Where(c =>
-                (c.Users[0].Login == loginFrom && c.Users[1].Login == loginTo) ||
-                (c.Users[1].Login == loginFrom && c.Users[0].Login == loginTo))
+            .Where(c => c.Users.Any(u => u.Login == loginFrom 
+                                         && loginTo.Contains(u.Login)))
             .Include(c => c.Users)
             .Include(c => c.Messages)
             .FirstOrDefaultAsync();
-        if (chat != null)
-        {
-            cache.Set($"{loginFrom}_{loginTo}", chat, new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromSeconds(2)));
-        }
         return chat;
-    }
-
-    public async Task<ChatEntity[]?> GetAllByLogin(string myLogin)
-    {
-        if (cache.TryGetValue($"{myLogin}", out ChatEntity[]? chats))
-            return chats;
-        chats = await context.Chats
-            .AsNoTracking()
-            .Include(c => c.Users)
-            .Where(c => c.Users.Any(u => u.Login == myLogin))
-            .ToArrayAsync();
-        if (chats.Length == 0)
-        {
-            cache.Set($"{myLogin}", chats, new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(1)));
-        }
-        return chats;
     }
 
     private async Task<ChatEntity?> GetOrCreateChat(string loginFrom, string[] loginTo)
