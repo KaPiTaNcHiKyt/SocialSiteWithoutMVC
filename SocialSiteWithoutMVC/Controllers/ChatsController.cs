@@ -35,7 +35,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
             return BadRequest("Cookie not found, authorize again");
         if (cache.TryGetValue($"{resultTest.resultCookie!}_{loginTo}", out ChatModel? chatModel))
             return Ok(chatModel);
-        var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
+        var chat = await chatService.GetChat(resultTest.resultCookie!, [ loginTo ]);
         if (chat == null)
             return NotFound();
         chatModel = ModelMapper.ChatEntityToModel(chat);
