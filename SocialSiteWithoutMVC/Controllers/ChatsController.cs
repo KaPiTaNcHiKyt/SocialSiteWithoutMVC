@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.infrastructureLogic.Services;
 using SocialSiteWithoutMVC.Interfaces;
@@ -27,16 +28,19 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     }
 
     [HttpGet("GetChatByUserLogin")]
-    public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo)
+    public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo, [FromServices] IMemoryCache cache)
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
+        if (cache.TryGetValue($"{resultTest.resultCookie!}_{loginTo}", out ChatModel? chatModel))
+            return Ok(chatModel);
         var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
         if (chat == null)
             return NotFound();
-        var chatModel = ModelMapper.ChatEntityToModel(chat);
+        chatModel = ModelMapper.ChatEntityToModel(chat);
         chatModel.UsersLogin = [loginTo];
+        cache.Set($"{resultTest.resultCookie!}_{loginTo}", chatModel, TimeSpan.FromSeconds(1));
         return Ok(chatModel);
     }
 
