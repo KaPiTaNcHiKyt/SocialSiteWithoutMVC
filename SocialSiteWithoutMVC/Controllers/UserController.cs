@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.infrastructureLogic.Services;
@@ -13,12 +14,15 @@ namespace SocialSiteWithoutMVC.Controllers;
 
 [ApiController]
 [Route("api/UserController")]
+[EnableRateLimiting("Default")]
 public class UserController(UserService userService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {
+    [EnableRateLimiting("Edit")]
     [HttpPost("PostUser")]
     public async Task<IActionResult> PostUser([Required] string login, [Required] string password, [Required] string nickname)
         => await userService.Add(login, password, nickname) ? Ok() : BadRequest();
+    
     
     [HttpPost("Login")]
     public async Task<ActionResult> Login([Required] string login, [Required] string password)
