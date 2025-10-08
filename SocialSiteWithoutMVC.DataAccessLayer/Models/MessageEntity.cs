@@ -9,6 +9,6 @@ public record MessageEntity
     public DateTime DateTime { get; set; } = DateTime.Now;
     public string Text { get; set; } = null!;
     [MapperIgnore]
-    public Guid ChatId { get; set; }
+    public string ChatName { get; set; } = null!;
     public string UserLogin { get; set; } = null!;
 }

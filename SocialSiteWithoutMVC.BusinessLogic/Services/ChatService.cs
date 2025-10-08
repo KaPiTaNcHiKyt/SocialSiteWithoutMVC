@@ -5,11 +5,11 @@ using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
 namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
-public class ChatService(SocialSiteDbContext context, IMemoryCache cache)
+public class ChatService(SocialSiteDbContext context)
 {
-    public async Task<bool> AddMessage(string text, string loginFrom, string[] loginTo)
+    public async Task<bool> AddMessage(string text, string loginFrom, string[] loginTo, string name = "") // string.Empty
     {
-        var chat = await GetOrCreateChat(loginFrom, loginTo);
+        var chat = await GetOrCreateChat(loginFrom, loginTo, name);
         if (chat == null)
             return false;
         var newMessage = new MessageEntity
@@ -26,17 +26,20 @@ public class ChatService(SocialSiteDbContext context, IMemoryCache cache)
 
     public async Task<ChatEntity?> GetChat(string loginFrom, string[] loginTo)
     {
+        var chatName = $"{loginFrom}_{loginTo.Aggregate(string.Empty,
+            (curr, next) => curr + $"{next} ")}";
         var chat = await context.Chats
             .AsNoTracking()
-            .Where(c => c.Users.Any(u => u.Login == loginFrom 
-                                         && loginTo.Contains(u.Login)))
+            // .Where(c => c.Users.Any(u => u.Login == loginFrom 
+            //                              && loginTo.Contains(u.Login)))
+            .Where(c => c.Name == chatName)
             .Include(c => c.Users)
             .Include(c => c.Messages)
             .FirstOrDefaultAsync();
         return chat;
     }
 
-    private async Task<ChatEntity?> GetOrCreateChat(string loginFrom, string[] loginTo)
+    private async Task<ChatEntity?> GetOrCreateChat(string loginFrom, string[] loginTo, string name)
     {
         var chat = await context.Chats
             .Where(c => c.Users.Any(u => u.Login == loginFrom 
@@ -54,9 +57,16 @@ public class ChatService(SocialSiteDbContext context, IMemoryCache cache)
             return null;
         var newChat = new ChatEntity
         {
-            Id = Guid.NewGuid(),
             Messages = new List<MessageEntity>(1)
         };
+        if (name == string.Empty)
+        {
+            newChat.Name = $"{loginFrom}_{loginTo
+                .Aggregate(string.Empty, (current, next) =>
+                    current + $"{next} ")}";
+        }
+        else
+            newChat.Name = name;
         foreach (var user in users)
         {
             user.Chats ??= new List<ChatEntity>(1);
