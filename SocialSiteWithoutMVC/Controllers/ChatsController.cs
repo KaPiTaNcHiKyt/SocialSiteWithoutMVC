@@ -30,6 +30,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     }
 
     [HttpGet("GetChatByUserLogin")]
+    [DisableRateLimiting]
     public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo, [FromServices] IMemoryCache cache)
     {
         var resultTest = MainTests("tasty-cookies");
