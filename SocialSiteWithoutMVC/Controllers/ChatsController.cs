@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.infrastructureLogic.Services;
@@ -14,6 +15,7 @@ namespace SocialSiteWithoutMVC.Controllers;
 [ApiController]
 [Route("api/Chats")]
 [Authorize]
+[EnableRateLimiting("Default")]
 public class ChatsController(ChatService chatService, JwtService jwtService, IHttpContextAccessor context) 
     : ControllerBase, ITestings
 {

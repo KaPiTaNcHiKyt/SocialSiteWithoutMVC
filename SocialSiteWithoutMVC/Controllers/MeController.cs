@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.infrastructureLogic.Services;
@@ -39,6 +40,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         return Ok(meModel);
     }
     
+    [EnableRateLimiting("Edit")]
     [HttpPatch("EditPassword")]
     public async Task<IActionResult> EditPassword([Required] string newPassword)
     {
@@ -49,6 +51,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         return Ok();
     }
     
+    [EnableRateLimiting("Edit")]
     [HttpPatch("EditNickname")]
     public async Task<IActionResult> EditNickname([Required] string newNickName)
     {
@@ -59,6 +62,7 @@ public class MeController(UserService userService, EditUserService editUserServi
         return Ok();
     }
     
+    [EnableRateLimiting("Edit")]
     [HttpDelete("DeleteThisAccount")]
     public async Task<IActionResult> DeleteAccount([Required] string password)
     {

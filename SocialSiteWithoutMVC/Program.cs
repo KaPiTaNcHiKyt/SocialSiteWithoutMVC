@@ -39,6 +39,7 @@ builder.Services.AddScoped<EditUserService>();
 builder.Services.AddAuthorization();
 builder.Services.AddApiAuthentification(builder.Configuration);
 builder.Services.AddMemoryCache();
+builder.Services.AddLimiter();
 
 var app = builder.Build();
 
@@ -46,6 +47,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseRateLimiter();
 
 app.UseSwagger()
     .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SocialSite v1"));
