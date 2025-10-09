@@ -14,7 +14,7 @@ public class ChatService(SocialSiteDbContext context)
             return false;
         var newMessage = new MessageEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             Text = text,
             UserLogin = loginFrom
         };

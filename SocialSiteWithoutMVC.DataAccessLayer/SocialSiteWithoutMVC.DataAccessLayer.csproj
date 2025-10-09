@@ -15,7 +15,6 @@
       </PackageReference>
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
       <PackageReference Include="Riok.Mapperly" />
-      <PackageReference Include="Ulid" />
     </ItemGroup>
 
     <ItemGroup>
