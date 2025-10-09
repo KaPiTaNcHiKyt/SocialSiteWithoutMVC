@@ -10,13 +10,13 @@ public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
     public void Configure(EntityTypeBuilder<MessageEntity> builder)
     {
         builder.HasKey(m => m.Id);
-        builder.HasIndex(m => m.ChatName).IsUnique(false);
+        builder.HasIndex(m => m.ChatId).IsUnique(false);
         builder.HasIndex(m => m.UserLogin).IsUnique(false);
 
         builder
             .HasOne<ChatEntity>()
             .WithMany(c => c.Messages)
-            .HasForeignKey(m => m.ChatName);
+            .HasForeignKey(m => m.ChatId);
 
         builder
             .HasOne<UserEntity>()
