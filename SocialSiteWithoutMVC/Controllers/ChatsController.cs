@@ -95,6 +95,16 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         var resultAdd = await chatService.AddUserToGroup(resultCookie!, login, groupName);
         return resultAdd ? Ok() : BadRequest("Group or user not found");
     }
+
+    [HttpDelete("QuitFromGroup")]
+    public async Task<IActionResult> QuitFromGroup([Required] string groupName)
+    {
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        var resultRemove = await chatService.QuitFromGroup(resultCookie!, groupName);
+        return resultRemove ? Ok() : BadRequest("Group not found");
+    }
     
     [SwaggerIgnore]
     public bool MainTests()
