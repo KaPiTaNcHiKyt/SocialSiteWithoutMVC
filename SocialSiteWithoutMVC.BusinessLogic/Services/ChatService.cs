@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.DataAccessLayer;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
 
@@ -7,9 +6,9 @@ namespace SocialSiteWithoutMVC.BusinessLogic.Services;
 
 public class ChatService(SocialSiteDbContext context)
 {
-    public async Task<bool> AddMessage(string text, string loginFrom, string[] loginTo, string name = "") // string.Empty
+    public async Task<bool> AddMessage(string text, string loginFrom, string loginTo)
     {
-        var chat = await GetOrCreateChat(loginFrom, loginTo, name);
+        var chat = await GetOrCreateChat(loginFrom, loginTo);
         if (chat == null)
             return false;
         var newMessage = new MessageEntity
@@ -19,31 +18,97 @@ public class ChatService(SocialSiteDbContext context)
             UserLogin = loginFrom
         };
         chat.Messages!.Add(newMessage);
-        context.Messages.Add(newMessage);
+        await context.Messages.AddAsync(newMessage);
         await context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<ChatEntity?> GetChat(string loginFrom, string[] loginTo)
+    public async Task<bool> AddMessageToGroup(string text, string loginFrom, string name)
     {
-        var chatName = $"{loginFrom}_{loginTo.Aggregate(string.Empty,
-            (curr, next) => curr + $"{next} ")}";
+        var chat = await GetGroupChat(loginFrom, name, false);
+        if (chat == null)
+            return false;
+        var newMessage = new MessageEntity
+        {
+            Id = Guid.CreateVersion7(),
+            Text = text,
+            UserLogin = loginFrom
+        };
+        chat.Messages ??= new List<MessageEntity>(1);
+        chat.Messages.Add(newMessage);
+        await context.Messages.AddAsync(newMessage);
+        await context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<ChatEntity?> GetChat(string loginFrom, string loginTo)
+    {
         var chat = await context.Chats
             .AsNoTracking()
-            // .Where(c => c.Users.Any(u => u.Login == loginFrom 
-            //                              && loginTo.Contains(u.Login)))
-            .Where(c => c.Name == chatName)
+            .Where(c => c.Users.Any(u => u.Login == loginFrom) 
+                                         && c.Users.Any(u => loginTo.Contains(u.Login)))
             .Include(c => c.Users)
             .Include(c => c.Messages)
             .FirstOrDefaultAsync();
         return chat;
     }
 
-    private async Task<ChatEntity?> GetOrCreateChat(string loginFrom, string[] loginTo, string name)
+    public async Task<ChatEntity?> GetGroupChat(string loginFrom, string name, bool asNoTracking = true)
+    {
+        if (!asNoTracking)
+        {
+            return await context.Chats
+                .Where(c => c.Name == name)
+                .Where(c => c.Users.Any(u => u.Login == loginFrom))
+                .Include(c => c.Messages)
+                .Include(c => c.Users)
+                .FirstOrDefaultAsync();
+        }
+        return await context.Chats
+            .AsNoTracking()
+            .Where(c => c.Name == name)
+            .Where(c => c.Users.Any(u => u.Login == loginFrom))
+            .Include(c => c.Messages)
+            .Include(c => c.Users)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<bool> CreateGroup(string loginFrom, string[] loginTo, string name)
+    {
+        var chat = await GetGroupChat(loginFrom, name);
+        if (chat is not null)
+            return false;
+        var users = await context.Users
+            .Where(u => u.Login == loginFrom 
+                        || loginTo.Contains(u.Login))
+            .Include(u => u.Chats)
+            .ToArrayAsync();
+        if (users.Length < 2)
+            return false;
+        var message = new MessageEntity
+        {
+            Id = Guid.CreateVersion7(),
+            Text = $"{loginFrom} создал чат {name}",
+            UserLogin = loginFrom
+        };
+        chat = new ChatEntity
+        {
+            Id = Guid.CreateVersion7(),
+            Name = name,
+            Users = users.ToList(),
+            Messages = [ message ]
+        };
+        await context.Chats.AddAsync(chat);
+        await context.Messages.AddAsync(message);
+        await context.SaveChangesAsync();
+        return true;
+    }
+
+    private async Task<ChatEntity?> GetOrCreateChat(string loginFrom, string loginTo)
     {
         var chat = await context.Chats
-            .Where(c => c.Users.Any(u => u.Login == loginFrom 
-                                         && loginTo.Contains(u.Login)))
+            .Where(c => c.Name == $"{loginFrom}_{loginTo}" 
+                        || c.Name == $"{loginTo}_{loginFrom}")
             .Include(c => c.Messages)
             .FirstOrDefaultAsync();
         if (chat != null)
@@ -57,16 +122,10 @@ public class ChatService(SocialSiteDbContext context)
             return null;
         var newChat = new ChatEntity
         {
+            Id = Guid.CreateVersion7(),
+            Name = $"{loginFrom}_{loginTo}",
             Messages = new List<MessageEntity>(1)
         };
-        if (name == string.Empty)
-        {
-            newChat.Name = $"{loginFrom}_{loginTo
-                .Aggregate(string.Empty, (current, next) =>
-                    current + $"{next} ")}";
-        }
-        else
-            newChat.Name = name;
         foreach (var user in users)
         {
             user.Chats ??= new List<ChatEntity>(1);
