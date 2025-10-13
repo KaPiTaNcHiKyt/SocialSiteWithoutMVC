@@ -30,6 +30,16 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         return resultAdd ? Ok() : BadRequest();
     }
     
+    [HttpPost("SendMessageToGroup")]
+    public async Task<IActionResult> SendMessageToGroup([Required] string text, [Required] string groupName)
+    {
+        var resultTest = MainTests("tasty-cookies");
+        if (!resultTest.isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        var resultAdd = await chatService.AddMessageToGroup(text, resultTest.resultCookie!, groupName);
+        return resultAdd ? Ok() : BadRequest();
+    }
+    
     [HttpGet("GetChatWithOneUser")]
     [DisableRateLimiting]
     public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo, [FromServices] IMemoryCache cache)
@@ -47,28 +57,9 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         cache.Set($"{resultTest.resultCookie!}_{loginTo}", chatModel, TimeSpan.FromSeconds(1));
         return Ok(chatModel);
     }
-
-    [HttpPost("SendMessageToGroup")]
-    public async Task<IActionResult> SendMessageToGroup([Required] string text, [Required] string groupName)
-    {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
-            return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.AddMessageToGroup(text, resultTest.resultCookie!, groupName);
-        return resultAdd ? Ok() : BadRequest();
-    }
-
-    [HttpPost("CreateGroup")]
-    public async Task<IActionResult> CreateGroup([Required] string groupName, [Required] params string[] logins)
-    {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
-            return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.CreateGroup(resultTest.resultCookie!, logins, groupName);
-        return resultAdd ? Ok() : BadRequest("Group already exists or users not found");
-    }
     
     [HttpGet("GetGroupChat")]
+    [DisableRateLimiting]
     public async Task<ActionResult<ChatModel>> GetGroupChat([Required] string groupName, [FromServices] IMemoryCache cache)
     {
         var resultTest = MainTests("tasty-cookies");
@@ -82,6 +73,17 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         chatModel = ModelMapper.ChatEntityToModel(chat);
         cache.Set($"{resultTest.resultCookie!}_{groupName}", chatModel, TimeSpan.FromSeconds(1));
         return Ok(chatModel);
+    }
+
+    [HttpPost("CreateGroup")]
+    [EnableRateLimiting("Edit")]
+    public async Task<IActionResult> CreateGroup([Required] string groupName, [Required] params string[] logins)
+    {
+        var resultTest = MainTests("tasty-cookies");
+        if (!resultTest.isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        var resultAdd = await chatService.CreateGroup(resultTest.resultCookie!, logins, groupName);
+        return resultAdd ? Ok() : BadRequest("Group already exists or users not found");
     }
 
     [SwaggerIgnore]
