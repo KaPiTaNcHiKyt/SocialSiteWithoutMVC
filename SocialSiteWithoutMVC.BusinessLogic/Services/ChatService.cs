@@ -25,7 +25,7 @@ public class ChatService(SocialSiteDbContext context)
 
     public async Task<bool> AddMessageToGroup(string text, string loginFrom, string name)
     {
-        var chat = await GetGroupChat(loginFrom, name, false);
+        var chat = await GetGroupChat(loginFrom, name, true);
         if (chat == null)
             return false;
         var newMessage = new MessageEntity
@@ -53,9 +53,9 @@ public class ChatService(SocialSiteDbContext context)
         return chat;
     }
 
-    public async Task<ChatEntity?> GetGroupChat(string loginFrom, string name, bool asNoTracking = true)
+    public async Task<ChatEntity?> GetGroupChat(string loginFrom, string name, bool tracking = false)
     {
-        if (!asNoTracking)
+        if (tracking)
         {
             return await context.Chats
                 .Where(c => c.Name == name)
@@ -100,6 +100,20 @@ public class ChatService(SocialSiteDbContext context)
         };
         await context.Chats.AddAsync(chat);
         await context.Messages.AddAsync(message);
+        await context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> AddUserToGroup(string loginFrom, string loginToAdd, string name)
+    {
+        var chat = await GetGroupChat(loginFrom, name, true);
+        if (chat is null)
+            return false;
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.Login == loginToAdd);
+        if (user is null)
+            return false;
+        chat.Users.Add(user);
         await context.SaveChangesAsync();
         return true;
     }

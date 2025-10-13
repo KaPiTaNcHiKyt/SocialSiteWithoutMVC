@@ -86,6 +86,16 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         return resultAdd ? Ok() : BadRequest("Group already exists or users not found");
     }
 
+    [HttpPost("AddUserToGroup")]
+    public async Task<IActionResult> AddUserToGroup([Required] string groupName, [Required] string login)
+    {
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        var resultAdd = await chatService.AddUserToGroup(resultCookie!, login, groupName);
+        return resultAdd ? Ok() : BadRequest("Group or user not found");
+    }
+    
     [SwaggerIgnore]
     public bool MainTests()
         => context.HttpContext is not null;
