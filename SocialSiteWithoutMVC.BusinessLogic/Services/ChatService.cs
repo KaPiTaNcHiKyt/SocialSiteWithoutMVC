@@ -45,8 +45,8 @@ public class ChatService(SocialSiteDbContext context)
     {
         var chat = await context.Chats
             .AsNoTracking()
-            .Where(c => c.Users.Any(u => u.Login == loginFrom) 
-                                         && c.Users.Any(u => loginTo.Contains(u.Login)))
+            .Where(c => c.Users.Any(u => u!.Login == loginFrom) 
+                                         && c.Users.Any(u => loginTo.Contains(u!.Login)))
             .Include(c => c.Users)
             .Include(c => c.Messages)
             .FirstOrDefaultAsync();
@@ -59,7 +59,7 @@ public class ChatService(SocialSiteDbContext context)
         {
             return await context.Chats
                 .Where(c => c.Name == name)
-                .Where(c => c.Users.Any(u => u.Login == loginFrom))
+                .Where(c => c.Users.Any(u => u!.Login == loginFrom))
                 .Include(c => c.Messages)
                 .Include(c => c.Users)
                 .FirstOrDefaultAsync();
@@ -67,7 +67,7 @@ public class ChatService(SocialSiteDbContext context)
         return await context.Chats
             .AsNoTracking()
             .Where(c => c.Name == name)
-            .Where(c => c.Users.Any(u => u.Login == loginFrom))
+            .Where(c => c.Users.Any(u => u!.Login == loginFrom))
             .Include(c => c.Messages)
             .Include(c => c.Users)
             .FirstOrDefaultAsync();
@@ -95,7 +95,7 @@ public class ChatService(SocialSiteDbContext context)
         {
             Id = Guid.CreateVersion7(),
             Name = name,
-            Users = users.ToList(),
+            Users = users.ToList()!,
             Messages = [ message ]
         };
         await context.Chats.AddAsync(chat);
@@ -115,6 +115,25 @@ public class ChatService(SocialSiteDbContext context)
             return false;
         chat.Users.Add(user);
         await context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> QuitFromGroup(string loginFrom, string name)
+    {
+        var chat = await GetGroupChat(loginFrom, name, true);
+        if (chat is null)
+            return false;   
+        chat.Users.Remove(chat.Users.FirstOrDefault(u => u!.Login == loginFrom));
+        if (chat.Users.Count == 0)
+        {
+            await context.Chats
+                .Where(c => c.Name == name)
+                .Where(c => c.Users.Any(u => u!.Login == loginFrom))
+                .Include(c => c.Messages)
+                .ExecuteDeleteAsync();
+        }
+        else
+            await context.SaveChangesAsync();
         return true;
     }
 
