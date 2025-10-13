@@ -77,12 +77,12 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
 
     [HttpPost("CreateGroup")]
     [EnableRateLimiting("Edit")]
-    public async Task<IActionResult> CreateGroup([Required] string groupName, [Required] params string[] logins)
+    public async Task<IActionResult> CreateGroup([Required] string groupName, [Required] params string[] loginsToAdd)
     {
         var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
         if (!isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.CreateGroup(resultCookie!, logins, groupName);
+        var resultAdd = await chatService.CreateGroup(resultCookie!, loginsToAdd, groupName);
         return resultAdd ? Ok() : BadRequest("Group already exists or users not found");
     }
 
