@@ -23,20 +23,20 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     [HttpPost("SendMessage")]
     public async Task<IActionResult> SendMessage([Required] string text, [Required] string loginTo)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, loginTo);
+        var resultAdd = await chatService.AddMessage(text, resultCookie!, loginTo);
         return resultAdd ? Ok() : BadRequest();
     }
     
     [HttpPost("SendMessageToGroup")]
     public async Task<IActionResult> SendMessageToGroup([Required] string text, [Required] string groupName)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.AddMessageToGroup(text, resultTest.resultCookie!, groupName);
+        var resultAdd = await chatService.AddMessageToGroup(text, resultCookie!, groupName);
         return resultAdd ? Ok() : BadRequest();
     }
     
@@ -44,17 +44,17 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     [DisableRateLimiting]
     public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo, [FromServices] IMemoryCache cache)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        if (cache.TryGetValue($"{resultTest.resultCookie!}_{loginTo}", out ChatModel? chatModel))
+        if (cache.TryGetValue($"{resultCookie!}_{loginTo}", out ChatModel? chatModel))
             return Ok(chatModel);
-        var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
+        var chat = await chatService.GetChat(resultCookie!, loginTo);
         if (chat == null)
             return NotFound();
         chatModel = ModelMapper.ChatEntityToModel(chat);
         chatModel.UsersLogin = [loginTo];
-        cache.Set($"{resultTest.resultCookie!}_{loginTo}", chatModel, TimeSpan.FromSeconds(1));
+        cache.Set($"{resultCookie!}_{loginTo}", chatModel, TimeSpan.FromSeconds(1));
         return Ok(chatModel);
     }
     
@@ -62,16 +62,16 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     [DisableRateLimiting]
     public async Task<ActionResult<ChatModel>> GetGroupChat([Required] string groupName, [FromServices] IMemoryCache cache)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        if (cache.TryGetValue($"{resultTest.resultCookie!}_{groupName}", out ChatModel? chatModel))
+        if (cache.TryGetValue($"{resultCookie!}_{groupName}", out ChatModel? chatModel))
             return Ok(chatModel);
-        var chat = await chatService.GetGroupChat(resultTest.resultCookie!, groupName);
+        var chat = await chatService.GetGroupChat(resultCookie!, groupName);
         if (chat == null)
             return NotFound();
         chatModel = ModelMapper.ChatEntityToModel(chat);
-        cache.Set($"{resultTest.resultCookie!}_{groupName}", chatModel, TimeSpan.FromSeconds(1));
+        cache.Set($"{resultCookie!}_{groupName}", chatModel, TimeSpan.FromSeconds(1));
         return Ok(chatModel);
     }
 
@@ -79,10 +79,10 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     [EnableRateLimiting("Edit")]
     public async Task<IActionResult> CreateGroup([Required] string groupName, [Required] params string[] logins)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.CreateGroup(resultTest.resultCookie!, logins, groupName);
+        var resultAdd = await chatService.CreateGroup(resultCookie!, logins, groupName);
         return resultAdd ? Ok() : BadRequest("Group already exists or users not found");
     }
 

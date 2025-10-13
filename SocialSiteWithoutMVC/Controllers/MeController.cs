@@ -21,12 +21,12 @@ public class MeController(UserService userService, EditUserService editUserServi
     [HttpGet("GetMe")]
     public async Task<ActionResult<UserModel>> GetMe([FromServices] IMemoryCache cache)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest();
-        if (cache.TryGetValue(resultTest.resultCookie!, out UserModel? meModel))
+        if (cache.TryGetValue(resultCookie!, out UserModel? meModel))
             return Ok(meModel);
-        var me = await userService.GetMe(resultTest.resultCookie!);
+        var me = await userService.GetMe(resultCookie!);
         if (me == null)
             return NotFound("User not found");
         meModel = ModelMapper.UserEntityToModel(me);
@@ -34,9 +34,9 @@ public class MeController(UserService userService, EditUserService editUserServi
             return meModel;
         foreach (var chat in meModel.Chats)
         {
-            chat.UsersLogin = chat.UsersLogin.Where(l => l != resultTest.resultCookie!).ToArray();
+            chat.UsersLogin = chat.UsersLogin.Where(l => l != resultCookie!).ToArray();
         }
-        cache.Set($"{resultTest.resultCookie}", meModel, TimeSpan.FromMinutes(5));
+        cache.Set($"{resultCookie}", meModel, TimeSpan.FromMinutes(5));
         return Ok(meModel);
     }
     
@@ -44,10 +44,10 @@ public class MeController(UserService userService, EditUserService editUserServi
     [HttpPatch("EditPassword")]
     public async Task<IActionResult> EditPassword([Required] string newPassword)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest();
-        await editUserService.PatchPassword(resultTest.resultCookie!, newPassword);
+        await editUserService.PatchPassword(resultCookie!, newPassword);
         return Ok();
     }
     
@@ -55,10 +55,10 @@ public class MeController(UserService userService, EditUserService editUserServi
     [HttpPatch("EditNickname")]
     public async Task<IActionResult> EditNickname([Required] string newNickName)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest();
-        await editUserService.PatchNickname(resultTest.resultCookie!, newNickName);
+        await editUserService.PatchNickname(resultCookie!, newNickName);
         return Ok();
     }
     
@@ -66,11 +66,11 @@ public class MeController(UserService userService, EditUserService editUserServi
     [HttpDelete("DeleteThisAccount")]
     public async Task<IActionResult> DeleteAccount([Required] string password)
     {
-        var resultTest = MainTests("tasty-cookies");
-        if (!resultTest.isConfirmTest)
+        var (isConfirmTest, resultCookie) = MainTests("tasty-cookies");
+        if (!isConfirmTest)
             return BadRequest();
         context.HttpContext!.Response.Cookies.Delete("tasty-cookies");
-        await userService.Delete(resultTest.resultCookie!, password);
+        await userService.Delete(resultCookie!, password);
         return Ok();
     }
 
