@@ -80,7 +80,6 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         if (chat == null)
             return NotFound();
         chatModel = ModelMapper.ChatEntityToModel(chat);
-        // chatModel.UsersLogin = [loginTo];
         cache.Set($"{resultTest.resultCookie!}_{groupName}", chatModel, TimeSpan.FromSeconds(1));
         return Ok(chatModel);
     }
