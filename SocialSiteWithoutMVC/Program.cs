@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationM
 using Microsoft.EntityFrameworkCore;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
 using SocialSiteWithoutMVC.DataAccessLayer;
-using SocialSiteWithoutMVC.infrastructureLogic.Extensions;
-using SocialSiteWithoutMVC.infrastructureLogic.Services;
-using SocialSiteWithoutMVC.infrastructureLogic.Settings;
+using SocialSiteWithoutMVC.InfrastructureLogic.Extensions;
+using SocialSiteWithoutMVC.InfrastructureLogic.Services;
+using SocialSiteWithoutMVC.InfrastructureLogic.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;

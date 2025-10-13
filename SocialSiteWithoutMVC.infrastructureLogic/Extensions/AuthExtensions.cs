@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SocialSiteWithoutMVC.infrastructureLogic.Settings;
+using SocialSiteWithoutMVC.InfrastructureLogic.Settings;
 
-namespace SocialSiteWithoutMVC.infrastructureLogic.Extensions;
+namespace SocialSiteWithoutMVC.InfrastructureLogic.Extensions;
 
 public static class AuthExtensions
 {

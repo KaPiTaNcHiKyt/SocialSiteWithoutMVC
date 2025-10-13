@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SocialSiteWithoutMVC.infrastructureLogic.Extensions;
+namespace SocialSiteWithoutMVC.InfrastructureLogic.Extensions;
 
 public static class RequestWaitExtension
 {
