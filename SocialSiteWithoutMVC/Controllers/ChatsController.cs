@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
+using SocialSiteWithoutMVC.DataAccessLayer.Models;
 using SocialSiteWithoutMVC.infrastructureLogic.Services;
 using SocialSiteWithoutMVC.Interfaces;
 using SocialSiteWithoutMVC.Mapper;
@@ -16,7 +17,7 @@ namespace SocialSiteWithoutMVC.Controllers;
 [Route("api/Chats")]
 [Authorize]
 [EnableRateLimiting("Default")]
-public class ChatsController(ChatService chatService, JwtService jwtService, IHttpContextAccessor context) 
+public class ChatsController(ChatService chatService, JwtService jwtService, IHttpContextAccessor context)
     : ControllerBase, ITestings
 {
     [HttpPost("SendMessage")]
@@ -25,11 +26,11 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, [ loginTo ]);
+        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, loginTo);
         return resultAdd ? Ok() : BadRequest();
     }
-
-    [HttpGet("GetChatByUserLogin")]
+    
+    [HttpGet("GetChatWithOneUser")]
     [DisableRateLimiting]
     public async Task<ActionResult<ChatModel>> GetChat([Required] string loginTo, [FromServices] IMemoryCache cache)
     {
@@ -38,7 +39,7 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
             return BadRequest("Cookie not found, authorize again");
         if (cache.TryGetValue($"{resultTest.resultCookie!}_{loginTo}", out ChatModel? chatModel))
             return Ok(chatModel);
-        var chat = await chatService.GetChat(resultTest.resultCookie!, [ loginTo ]);
+        var chat = await chatService.GetChat(resultTest.resultCookie!, loginTo);
         if (chat == null)
             return NotFound();
         chatModel = ModelMapper.ChatEntityToModel(chat);
@@ -48,13 +49,40 @@ public class ChatsController(ChatService chatService, JwtService jwtService, IHt
     }
 
     [HttpPost("SendMessageToGroup")]
-    public async Task<IActionResult> SendMessageToGroup([Required] string text, [Required] params string[] logins)
+    public async Task<IActionResult> SendMessageToGroup([Required] string text, [Required] string groupName)
     {
         var resultTest = MainTests("tasty-cookies");
         if (!resultTest.isConfirmTest)
             return BadRequest("Cookie not found, authorize again");
-        var resultAdd = await chatService.AddMessage(text, resultTest.resultCookie!, logins);
+        var resultAdd = await chatService.AddMessageToGroup(text, resultTest.resultCookie!, groupName);
         return resultAdd ? Ok() : BadRequest();
+    }
+
+    [HttpPost("CreateGroup")]
+    public async Task<IActionResult> CreateGroup([Required] string groupName, [Required] params string[] logins)
+    {
+        var resultTest = MainTests("tasty-cookies");
+        if (!resultTest.isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        var resultAdd = await chatService.CreateGroup(resultTest.resultCookie!, logins, groupName);
+        return resultAdd ? Ok() : BadRequest("Group already exists or users not found");
+    }
+    
+    [HttpGet("GetGroupChat")]
+    public async Task<ActionResult<ChatModel>> GetGroupChat([Required] string groupName, [FromServices] IMemoryCache cache)
+    {
+        var resultTest = MainTests("tasty-cookies");
+        if (!resultTest.isConfirmTest)
+            return BadRequest("Cookie not found, authorize again");
+        if (cache.TryGetValue($"{resultTest.resultCookie!}_{groupName}", out ChatModel? chatModel))
+            return Ok(chatModel);
+        var chat = await chatService.GetGroupChat(resultTest.resultCookie!, groupName);
+        if (chat == null)
+            return NotFound();
+        chatModel = ModelMapper.ChatEntityToModel(chat);
+        // chatModel.UsersLogin = [loginTo];
+        cache.Set($"{resultTest.resultCookie!}_{groupName}", chatModel, TimeSpan.FromSeconds(1));
+        return Ok(chatModel);
     }
 
     [SwaggerIgnore]
