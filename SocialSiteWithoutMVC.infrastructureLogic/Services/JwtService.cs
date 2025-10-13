@@ -4,9 +4,9 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SocialSiteWithoutMVC.DataAccessLayer.Models;
-using SocialSiteWithoutMVC.infrastructureLogic.Settings;
+using SocialSiteWithoutMVC.InfrastructureLogic.Settings;
 
-namespace SocialSiteWithoutMVC.infrastructureLogic.Services;
+namespace SocialSiteWithoutMVC.InfrastructureLogic.Services;
 
 public class JwtService(IOptions<AuthSettings> options)
 {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using SocialSiteWithoutMVC.BusinessLogic.Services;
-using SocialSiteWithoutMVC.infrastructureLogic.Services;
+using SocialSiteWithoutMVC.InfrastructureLogic.Services;
 using SocialSiteWithoutMVC.Interfaces;
 using SocialSiteWithoutMVC.Mapper;
 using SocialSiteWithoutMVC.Models;
