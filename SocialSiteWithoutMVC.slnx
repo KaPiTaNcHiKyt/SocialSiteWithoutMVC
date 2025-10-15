@@ -6,6 +6,6 @@
   </Folder>
   <Project Path="SocialSiteWithoutMVC.BusinessLogic\SocialSiteWithoutMVC.BusinessLogic.csproj" Type="Classic C#" />
   <Project Path="SocialSiteWithoutMVC.DataAccessLayer\SocialSiteWithoutMVC.DataAccessLayer.csproj" Type="Classic C#" />
-  <Project Path="SocialSiteWithoutMVC.InfrastructureLogic\SocialSiteWithoutMVC.InfrastructureLogi.csproj" Type="Classic C#" />
+  <Project Path="SocialSiteWithoutMVC.InfrastructureLogic\SocialSiteWithoutMVC.InfrastructureLogic.csproj" Type="Classic C#" />
   <Project Path="SocialSiteWithoutMVC\SocialSiteWithoutMVC.csproj" Type="Classic C#" />
 </Solution>
