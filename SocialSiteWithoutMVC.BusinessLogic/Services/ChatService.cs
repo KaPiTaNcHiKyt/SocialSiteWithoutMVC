@@ -137,6 +137,14 @@ public class ChatService(SocialSiteDbContext context)
         return true;
     }
 
+    public async Task Delete(string loginFrom, string loginTo)
+    {
+        await context.Chats
+            .Where(c => c.Name == $"{loginFrom}_{loginTo}" 
+                        || c.Name == $"{loginTo}_{loginFrom}")
+            .ExecuteDeleteAsync();
+    }
+
     private async Task<ChatEntity?> GetOrCreateChat(string loginFrom, string loginTo)
     {
         var chat = await context.Chats
